@@ -1,5 +1,4 @@
 import { Server, Socket } from "socket.io";
-// require('dotenv').config()
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -9,8 +8,6 @@ import docController from "./controller/docController.js";
 import { updateDoc } from "./controller/docController.js";
 // const PORT = 9000;
 
-
-// console.log("p", process.env.URL)
 Connection(process.env.URL);
 
 const io = new Server(process.env.PORT, {
@@ -25,18 +22,18 @@ io.on("connection", (socket) => {
     const document = await docController(docId)
     socket.join(docId);
     socket.emit("load-document", document.data);
-
+    
     socket.on("send-changes", (delta) => {
       // console.log('delta', delta);
       socket.broadcast.to(docId).emit("receive-changes", delta);
     });
-
-    socket.on('anmol',(name)=>{
-      console.log("name is ", name);
-    })
+    
     socket.on('save-document', async (data,name)=>{
-        console.log("name coming");
-        await updateDoc(docId, data);
+      console.log("name coming");
+      await updateDoc(docId, data);
     });
   });
+  socket.on('anmol',(name)=>{
+    console.log('name is '+name);
+  })
 });
